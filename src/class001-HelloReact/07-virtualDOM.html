@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>virtualDOM</title>
+    <!--  引入 React 核心库  -->
+    <script src="script/react.development.js"></script>
+    <!--  引入 React的Dom 库  -->
+    <script src="script/react-dom.development.js"></script>
+    <!--  引入 babel  -->
+    <script src="script/babel.min.js"></script>
+</head>
+<body>
+<button id="btn">click me</button>
+<hr>
+<div id="root"></div>
+<!-- 设置 JS 代码被 babel 处理 -->
+<script type="text/babel">
+
+    // 创建一个数据
+    const data = ['孙悟空','猪八戒','沙和尚'];
+
+    // 创建列表
+    const list = <ul>
+        {data.map(item => <li key={item}>{item}</li>)}
+    </ul>;
+
+    // 获取根元素
+    const root = ReactDOM.createRoot(document.getElementById('root'))
+    root.render(list);
+
+    /*
+     *  在 React 中，我们操作的元素被称为 React 元素，并不是真正的原生 DOM 元素
+     *      React 通过虚拟 DOM 将 React 元素和原生 DOM 进行映射
+     *      虽然操作的 React 元素，但是这些操作最终都会在真实 DOM 中体现
+     *  虚拟 DOM 的好处：
+     *      1. 降低 API 的复杂度
+     *      2. 解决兼容问题
+     *      3. 提升性能（减少 DOM 的不必要操作）
+     *
+     *  每当我们调用 root.render() 时，页面就会发生重新渲染
+     *      React 会通过 diffing 算法，将新的元素和旧的元素进行比较
+     *      通过比较找到发生变化的元素，并且只对变化的元素进行修改，没有发生的变化不予处理
+     */
+
+    document.getElementById('btn').onclick = function (){
+        // 重新渲染页面
+        // 创建一个数据
+        const data = ['孙悟空','猪八戒','沙和尚'];
+        // 创建列表
+        const list = <ul>
+            {data.map(item => <li key={item}>{item}</li>)}
+        </ul>;
+        root.render(list);
+        /*
+        *   比较两次数据时，React会先比较父元素，父元素如果不同，直接所有元素全部替换
+        *       父元素一致，再去逐个比较子元素，直到发生所有变化的元素为止
+        *   上例中，新旧两组数据完全一致，所以没有任何 DOM 对象被修改
+        *
+        *   当我们在 JSX 中显示数组时，数组中每一个元素都需要设置一个唯一 KEY
+        *       否则控制台会显示红色警告
+        *   重新渲染页面时，React 会按照顺序依次比较对应的元素，当渲染一个列表的时候，
+        *       如果不指定 KEY，同样也会按照顺序进行比较
+        *   如果列表的顺序永远不会发生变化，这么做是没有问题的，
+        *       但是如果列表的顺序可能会发生变化，这样做可能会导致性能问题出现
+        *
+        *   为了解决这个问题，React 为列表设计了一个 KEY 属性，
+        *       KEY 的作用相当于 ID，只是无法在页面中查看
+        *       当设置了 KEY 后再比较元素时
+        *       就会比较相同 KEY 的元素，而不是按照顺序进行比较
+        *   在渲染一个列表时，通常会给列表项设置一个唯一的 KEY 来避免上述问题
+        *       这个 KEY 在当前列表中唯一即可
+        *   注意：
+        *       1. 开发中一般会使用数据的 ID 作为 KEY
+        *       2. 尽量不要用元素的 index 作为 KEY
+        *           索引会跟着元素顺序的改变而改变，所以使用索引做 KEY 跟没有 KEY 是一样的
+        *           唯一的不同就是，控制台的警告没了
+        *           当元素的顺序不会发生变化时，用索引做 KEY 也没什么问题
+        * */
+    }
+</script>
+</body>
+</html>
